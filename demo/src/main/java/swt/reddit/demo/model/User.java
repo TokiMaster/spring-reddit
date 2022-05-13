@@ -12,6 +12,9 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="type", discriminatorType=DiscriminatorType.STRING)
+@DiscriminatorValue(value = "user")
 public class User {
 
     @Id
@@ -50,4 +53,8 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Report> reports;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Banned> banned;
+
 }

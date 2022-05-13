@@ -10,19 +10,13 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report {
+public class Banned {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private ReportReason reason;
-
-    @Column(nullable = false)
     private LocalDateTime timeStamp;
-
-    @Column
-    private boolean accepted;
 
 }

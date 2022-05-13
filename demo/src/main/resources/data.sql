@@ -1,0 +1,2 @@
+insert into user (type, username, password, email, avatar, registration_date, description, display_name)
+values('user','Toki', 'toki', 'example@gmail.com', 'lol', '2022-05-13 19:42:10', 'Optimistic', 'Toki master lmao');

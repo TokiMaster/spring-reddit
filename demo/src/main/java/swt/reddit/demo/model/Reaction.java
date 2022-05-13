@@ -1,6 +1,5 @@
 package swt.reddit.demo.model;
 
-
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,10 +16,10 @@ public class Reaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private ReactionType type;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime timeStamp;
 
 }

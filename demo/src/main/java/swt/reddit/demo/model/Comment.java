@@ -17,10 +17,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String text;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime timeStamp;
 
     @Column
