@@ -1,6 +1,8 @@
 package swt.reddit.demo.model;
 
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -30,31 +32,48 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column()
     private String avatar;
 
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
-    @Column(nullable = false)
+    @Column()
     private String description;
 
     @Column(nullable = false)
     private String displayName;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private Set<Post> posts;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private Set<Comment> comments;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private Set<Reaction> reactions;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private Set<Report> reports;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private Set<Banned> banned;
+
+    public User(String username, String password, String email, LocalDateTime registrationDate, String displayName) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.registrationDate = registrationDate;
+        this.displayName = displayName;
+    }
+
+    public GrantedAuthority getRole() {
+        return new SimpleGrantedAuthority("USER");
+    }
 
 }

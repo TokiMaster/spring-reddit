@@ -32,6 +32,7 @@ public class Community {
     private String suspendedReason;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "community_id")
     private Set<Rule> rules;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

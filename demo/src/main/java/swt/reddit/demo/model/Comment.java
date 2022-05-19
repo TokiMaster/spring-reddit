@@ -26,10 +26,18 @@ public class Comment {
     @Column
     private boolean isDeleted;
 
+    @ManyToOne()
+    private User user;
+
+    @ManyToOne()
+    private Post post;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "comment_id")
     private Set<Reaction> reactions;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "comment_id")
     private Set<Report> reports;
 
 }

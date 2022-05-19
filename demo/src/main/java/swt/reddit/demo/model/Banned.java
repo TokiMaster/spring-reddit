@@ -19,4 +19,9 @@ public class Banned {
     @Column(nullable = false)
     private LocalDateTime timeStamp;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Moderator by;
+
+    @ManyToOne()
+    private User user;
 }

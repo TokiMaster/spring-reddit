@@ -25,4 +25,9 @@ public class Report {
     @Column
     private boolean accepted;
 
+    @ManyToOne()
+    private User user;
+
+    @ManyToOne()
+    private Report report;
 }

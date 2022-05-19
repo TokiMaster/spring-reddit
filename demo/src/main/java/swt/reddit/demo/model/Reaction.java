@@ -22,4 +22,12 @@ public class Reaction {
     @Column(nullable = false)
     private LocalDateTime timeStamp;
 
+    @ManyToOne()
+    private User user;
+
+    @ManyToOne()
+    private Post post;
+
+    @ManyToOne()
+    private Comment comment;
 }

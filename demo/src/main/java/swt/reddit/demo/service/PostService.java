@@ -6,6 +6,7 @@ import swt.reddit.demo.model.Post;
 import swt.reddit.demo.repository.PostRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -15,5 +16,9 @@ public class PostService {
 
     public List<Post> findAll(){
         return postRepository.findAll();
+    }
+
+    public Optional<Post> findOne(Long id){
+        return postRepository.findById(id);
     }
 }

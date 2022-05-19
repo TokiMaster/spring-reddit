@@ -17,4 +17,7 @@ public class Rule {
     @Column(nullable = false)
     private String description;
 
+    @ManyToOne()
+    private Community community;
+
 }

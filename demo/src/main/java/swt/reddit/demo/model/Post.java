@@ -28,10 +28,19 @@ public class Post {
     @Column
     private String imagePath;
 
+    @ManyToOne()
+    private User user;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id")
+    private Set<Comment> comments;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id")
     private Set<Reaction> reactions;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id")
     private Set<Report> reports;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

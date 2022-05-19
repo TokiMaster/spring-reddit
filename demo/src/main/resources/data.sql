@@ -1,4 +1,7 @@
-insert into user (type, username, password, email, avatar, registration_date, description, display_name) values('admin','Toki', 'toki', 'example@gmail.com', 'lol', '2022-05-13 19:42:10', 'Optimistic', 'Toki master lmao');
-insert into post (title, text, creation_date, image_path) values('Proba','Lorem ipsum dolor sit amet.', '2022-05-13 19:42:10', 'lol');
-insert into user (type, username, password, email, avatar, registration_date, description, display_name) values('user','Vlaki', 'vlaki', 'example@gmail.com', 'lol', '2022-05-13 19:42:10', 'Complicated ahahahah', 'Vlaki je car');
-insert into user_posts (user_id, posts_id) values (1, 1);
+insert into user (type, username, password, email, avatar, registration_date, description, display_name)
+values('admin','Toki', '$2a$12$9vqtik0tstrwzgS20mXpZeM3J4scMaDs3QhI7W9gfhL4Z18ch7BlC', 'toki@gmail.com', 'lol', '2022-05-13 19:42:10', 'Optimistic', 'Toki master lmao');
+insert into user (type, username, password, email, avatar, registration_date, description, display_name)
+values('user','Vlaki', '$2a$12$EgGKK227HZdPAUSVYFlyfumHsevvCDVBZv/2xKFV6K/2AEokY7mVW', 'vlaki@gmail.com', 'lol', '2022-05-13 19:42:10', 'Complicated ahahahah', 'Vlaki je car');
+insert into post (title, text, creation_date, image_path, user_id)
+values('Proba','Lorem ipsum dolor sit amet.', '2022-05-13 19:42:10', 'lol', '2');
+-- select * from user;
