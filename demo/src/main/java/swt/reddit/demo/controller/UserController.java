@@ -3,6 +3,7 @@ package swt.reddit.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import swt.reddit.demo.model.User;
 import swt.reddit.demo.service.UserService;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public class UserController {
 
         List<UserDTO> userDTO = new ArrayList<>();
         for(User user : users){
-            userDTO.add(new UserDTO(user));
+            userDTO.add(new UserDTO(user.getUsername(), user.getPassword(), user.getEmail(), user.getDisplayName()));
         }
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
@@ -78,7 +80,8 @@ public class UserController {
         if(result.hasErrors()){
             return ResponseEntity.badRequest().body("invalid json");
         }
-        return ResponseEntity.ok(userService.register(userDTO));
+        User user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), LocalDateTime.now(), userDTO.getDisplayName());
+        return ResponseEntity.ok(userService.register(user));
     }
 
 }

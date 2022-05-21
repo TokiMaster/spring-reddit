@@ -46,8 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuthenticationTokenFilter authenticationTokenFilterBean()
             throws Exception {
         AuthenticationTokenFilter authenticationTokenFilter = new AuthenticationTokenFilter();
-        authenticationTokenFilter
-                .setAuthenticationManager(authenticationManagerBean());
+        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
         return authenticationTokenFilter;
     }
 
@@ -59,7 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //Neophodno da ne bi proveravali autentifikaciju kod Preflight zahteva
         httpSecurity.cors();
         //sledeca linija je neophodna iskljucivo zbog nacina na koji h2 konzola komunicira sa aplikacijom
-        httpSecurity.headers().frameOptions().disable();
+//        httpSecurity.headers().frameOptions().disable();
         httpSecurity.csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

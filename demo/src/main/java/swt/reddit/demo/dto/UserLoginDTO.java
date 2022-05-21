@@ -1,20 +1,13 @@
 package swt.reddit.demo.dto;
 
 import lombok.*;
-import swt.reddit.demo.model.User;
+import java.io.Serializable;
 
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-public class UserLoginDTO {
+@Data
+public class UserLoginDTO implements Serializable {
 
-    private String username;
-    private String password;
-
-    public UserLoginDTO(User user){
-        this(user.getUsername(), user.getPassword());
-    }
+    private final String username;
+    private final String password;
 
 }

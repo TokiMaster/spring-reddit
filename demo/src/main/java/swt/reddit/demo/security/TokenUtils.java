@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class TokenUtils {
 
-    @Value("biloKojiString")
+    @Value("$2a$12$PVEf8/5afGXSUdIntwLT5e/tNw1yuGq2ZHaMIoV34LWbuwhbL6qPu")
     private String secret;
 
     @Value("3600") //3600 sec = 1h

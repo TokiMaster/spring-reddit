@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import swt.reddit.demo.dto.UserDTO;
 import swt.reddit.demo.model.User;
 import swt.reddit.demo.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,9 +34,8 @@ public class UserService {
         return userRepository.findUserByUsername(username);
     }
 
-    public User register(UserDTO userDTO){
-        return  userRepository.save(new User(userDTO.getUsername(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(),
-                LocalDateTime.now(), userDTO.getDisplayName()));
+    public User register(User user){
+        return  userRepository.save(user);
     }
 
 }

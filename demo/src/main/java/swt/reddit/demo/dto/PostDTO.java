@@ -1,25 +1,21 @@
 package swt.reddit.demo.dto;
 
 import lombok.*;
-import swt.reddit.demo.model.Post;
-import swt.reddit.demo.model.User;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class PostDTO {
+@Data
+public class PostDTO implements Serializable {
 
-    private String title;
-    private String text;
-    private LocalDateTime creationDate;
-    private String imagePath;
-    private String displayName;
-
-    public PostDTO(Post post){
-        this(post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getDisplayName());
-    }
+    @NotNull
+    private final String title;
+    @Length(min = 5)
+    private final String text;
+    private final LocalDateTime creationDate;
+    private final String imagePath;
+    private final String username;
 
 }
