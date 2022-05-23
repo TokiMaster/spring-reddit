@@ -1,41 +1,14 @@
 package swt.reddit.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import swt.reddit.demo.model.User;
-import swt.reddit.demo.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class UserService {
-
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    @Lazy
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public List<User> findAll(){
-        return userRepository.findAll();
-    }
-
-    public User findByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
-
-    public User register(User user){
-        return  userRepository.save(user);
-    }
-
+public interface UserService {
+    List<User> findAll();
+    User findByUsername(String username);
+    Optional<User> findUserById(Long id);
+    User register(User user);
+    User updateUser(User user);
 }

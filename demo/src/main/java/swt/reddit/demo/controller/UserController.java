@@ -11,24 +11,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import swt.reddit.demo.security.TokenUtils;
 import swt.reddit.demo.dto.UserDTO;
+import swt.reddit.demo.dto.UserLoginDTO;
+import swt.reddit.demo.dto.UserPasswordDTO;
 import swt.reddit.demo.model.User;
-import swt.reddit.demo.service.UserService;
+import swt.reddit.demo.security.TokenUtils;
+import swt.reddit.demo.service.serviceImpl.UserServiceImpl;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/users")
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -40,7 +44,10 @@ public class UserController {
     private TokenUtils tokenUtils;
 
     @Autowired
-    public UserController(UserService userService, AuthenticationManager authenticationManager,
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService, TokenUtils tokenUtils){
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -48,7 +55,7 @@ public class UserController {
         this.tokenUtils = tokenUtils;
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<UserDTO>> getAllUsers(){
 
         List<User> users = userService.findAll();
@@ -61,14 +68,24 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOnePost(@PathVariable("id") Long id){
+        Optional<User> user = userService.findUserById(id);
+        if(user.isEmpty()){
+            return ResponseEntity.badRequest().body("User with given id doesn't exist");
+        }
+        UserDTO userDTO = new UserDTO(user.get().getUsername(), user.get().getPassword(), user.get().getEmail(), user.get().getDisplayName());
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDto) {
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userDTO) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword());
+                new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.getUsername());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userDTO.getUsername());
             return ResponseEntity.ok(tokenUtils.generateToken(userDetails));
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -78,10 +95,38 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserDTO userDTO, BindingResult result){
         if(result.hasErrors()){
-            return ResponseEntity.badRequest().body("invalid json");
+            return ResponseEntity.badRequest().body("Invalid json");
         }
-        User user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), LocalDateTime.now(), userDTO.getDisplayName());
+        String password = passwordEncoder.encode(userDTO.getPassword());
+        User user = new User(userDTO.getUsername(), password, userDTO.getEmail(), LocalDateTime.now(), userDTO.getDisplayName());
         return ResponseEntity.ok(userService.register(user));
+    }
+
+    @PutMapping("/{id}")
+    @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
+    public ResponseEntity<?> changePassword(@RequestBody @Valid UserPasswordDTO passwordDTO, BindingResult result,
+                        @PathVariable("id") Long id, Authentication auth){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body("Password must contain minimum eight characters, " +
+                    "at least one uppercase letter, one lowercase letter, one number and one special character");
+        }
+        User loggedUser = userService.findByUsername(auth.getName());
+        Optional<User> user = userService.findUserById(id);
+        if(user.isEmpty()){
+            return ResponseEntity.badRequest().body("User with given id doesn't exist");
+        } else{
+            if(!loggedUser.getId().equals(user.get().getId())){
+                return ResponseEntity.badRequest().body("Forbidden!");
+            }
+            if(passwordEncoder.matches( passwordDTO.getPassword(), user.get().getPassword())){
+                String newPassword = passwordEncoder.encode(passwordDTO.getNewPassword());
+                user.get().setPassword(newPassword);
+                userService.updateUser(user.get());
+                return new ResponseEntity<>("Password changed successfully!", HttpStatus.OK);
+            }else {
+                return ResponseEntity.badRequest().body("Incorrect password");
+            }
+        }
     }
 
 }

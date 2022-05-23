@@ -1,23 +1,20 @@
 package swt.reddit.demo.dto;
 
-import lombok.*;
+import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import swt.reddit.demo.model.Rule;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
-public class PostDTO implements Serializable {
+public class CommunityDTO implements Serializable {
 
     @NotNull
-    private final Long communityId;
-    @NotNull
-    private final String title;
+    private final String name;
     @Length(min = 5)
-    private final String text;
+    private final String description;
     private final LocalDateTime creationDate;
-    private final String imagePath;
-    private final String username;
-
 }

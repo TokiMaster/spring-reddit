@@ -9,10 +9,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.dto.PostUpdateDTO;
+import swt.reddit.demo.model.Community;
 import swt.reddit.demo.model.Post;
 import swt.reddit.demo.model.User;
-import swt.reddit.demo.service.PostService;
-import swt.reddit.demo.service.UserService;
+import swt.reddit.demo.service.CommunityService;
+import swt.reddit.demo.service.serviceImpl.PostServiceImpl;
+import swt.reddit.demo.service.serviceImpl.UserServiceImpl;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -26,20 +28,22 @@ import java.util.Optional;
 public class PostController {
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
+    @Autowired
+    private CommunityService communityService;
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<PostDTO>> getAllPosts(){
 
         List<Post> posts = postService.findAll();
 
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
-            postsDTO.add(new PostDTO(post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            postsDTO.add(new PostDTO(post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
         }
 
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
@@ -51,7 +55,7 @@ public class PostController {
         if(post.isEmpty()){
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");
         }
-        PostDTO postDTO = new PostDTO(post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getImagePath(), post.get().getUser().getUsername());
+        PostDTO postDTO = new PostDTO(post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getImagePath(), post.get().getUser().getUsername());
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
 
@@ -63,7 +67,11 @@ public class PostController {
             return ResponseEntity.badRequest().body("Invalid json");
         }
         User user = userService.findByUsername(auth.getName());
-        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), postDTO.getImagePath(), user);
+        Optional<Community> community = communityService.findCommunityById(postDTO.getCommunityId());
+        if(community.isEmpty()){
+            return ResponseEntity.badRequest().body("Community with given id doesn't exist!");
+        }
+        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), postDTO.getImagePath(), user, community.get());
         var createdPost = postService.createPost(post);
         return ResponseEntity.ok(createdPost.getId());
     }

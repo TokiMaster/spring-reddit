@@ -32,6 +32,9 @@ public class Community {
     private String suspendedReason;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Post> posts;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "community_id")
     private Set<Rule> rules;
 
@@ -43,4 +46,9 @@ public class Community {
     @JoinTable(name = "community_flair", joinColumns = @JoinColumn(name = "community_id"), inverseJoinColumns = @JoinColumn(name = "flair_id"))
     private Set<Flair> flairs;
 
+    public Community(String name, String description, LocalDateTime creationDate) {
+        this.name = name;
+        this.description = description;
+        this.creationDate = creationDate;
+    }
 }

@@ -1,4 +1,4 @@
-package swt.reddit.demo.service;
+package swt.reddit.demo.service.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -18,11 +18,10 @@ import java.util.List;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
-
+    private UserServiceImpl userService;
 
     @Autowired
-    public UserDetailsServiceImpl(UserService userService){
+    public UserDetailsServiceImpl(UserServiceImpl userService){
         this.userService = userService;
     }
 

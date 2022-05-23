@@ -31,6 +31,10 @@ public class Post {
     @ManyToOne()
     private User user;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "community_id")
+    private Community community;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Set<Comment> comments;
@@ -47,11 +51,13 @@ public class Post {
     @JoinTable(name = "post_flair", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "flair_id"))
     private Set<Flair> flairs;
 
-    public Post(String title, String text, LocalDateTime creationDate, String imagePath, User user) {
+    public Post(String title, String text, LocalDateTime creationDate, String imagePath, User user, Community community) {
         this.title = title;
         this.text = text;
         this.creationDate = creationDate;
         this.imagePath = imagePath;
         this.user = user;
+        this.community = community;
     }
+
 }
