@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import swt.reddit.demo.dto.CreatePostDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.dto.PostUpdateDTO;
 import swt.reddit.demo.model.Community;
@@ -43,7 +44,7 @@ public class PostController {
 
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
-            postsDTO.add(new PostDTO(post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
         }
 
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
@@ -55,14 +56,14 @@ public class PostController {
         if(post.isEmpty()){
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");
         }
-        PostDTO postDTO = new PostDTO(post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getImagePath(), post.get().getUser().getUsername());
+        PostDTO postDTO = new PostDTO(post.get().getId(), post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getImagePath(), post.get().getUser().getUsername());
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
 
     @PostMapping()
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
     @Transactional
-    public ResponseEntity<?> createPost(@RequestBody @Valid PostDTO postDTO, BindingResult result, Authentication auth){
+    public ResponseEntity<?> createPost(@RequestBody @Valid CreatePostDTO postDTO, BindingResult result, Authentication auth){
         if(result.hasErrors()){
             return ResponseEntity.badRequest().body("Invalid json");
         }
@@ -71,7 +72,7 @@ public class PostController {
         if(community.isEmpty()){
             return ResponseEntity.badRequest().body("Community with given id doesn't exist!");
         }
-        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), postDTO.getImagePath(), user, community.get());
+        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), user, community.get());
         var createdPost = postService.createPost(post);
         return ResponseEntity.ok(createdPost.getId());
     }
@@ -102,12 +103,17 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
-    public ResponseEntity<?> deletePost(@PathVariable("id") Long id){
+    public ResponseEntity<?> deletePost(@PathVariable("id") Long id, Authentication auth){
         Optional<Post> post = postService.findPostById(id);
         if(post.isEmpty()){
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");
         }
-        postService.deletePost(post.get());
-        return ResponseEntity.ok("Deleted post with id: " + id);
+        User loggedUser = userService.findByUsername(auth.getName());
+        if(post.get().getUser().getUsername().equals(loggedUser.getUsername())){
+            postService.deletePost(post.get());
+            return ResponseEntity.ok("Deleted post with id: " + id);
+        }else{
+            return ResponseEntity.badRequest().body("Method not allowed!");
+        }
     }
 }

@@ -41,4 +41,9 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Post post){
         postRepository.delete(post);
     }
+
+    @Override
+    public List<Post> findPostsByCommunityId(Long id) {
+        return postRepository.findPostsByCommunityId(id);
+    }
 }

@@ -56,6 +56,7 @@ public class UserController {
     }
 
     @GetMapping()
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<List<UserDTO>> getAllUsers(){
 
         List<User> users = userService.findAll();
@@ -69,7 +70,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOnePost(@PathVariable("id") Long id){
+    @Secured("ROLE_ADMIN")
+    public ResponseEntity<?> getOneUser(@PathVariable("id") Long id){
         Optional<User> user = userService.findUserById(id);
         if(user.isEmpty()){
             return ResponseEntity.badRequest().body("User with given id doesn't exist");
@@ -118,7 +120,7 @@ public class UserController {
             if(!loggedUser.getId().equals(user.get().getId())){
                 return ResponseEntity.badRequest().body("Forbidden!");
             }
-            if(passwordEncoder.matches( passwordDTO.getPassword(), user.get().getPassword())){
+            if(passwordEncoder.matches(passwordDTO.getPassword(), user.get().getPassword())){
                 String newPassword = passwordEncoder.encode(passwordDTO.getNewPassword());
                 user.get().setPassword(newPassword);
                 userService.updateUser(user.get());

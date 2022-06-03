@@ -11,6 +11,6 @@ public class Moderator extends User {
 
     @Override
     public GrantedAuthority getRole() {
-        return new SimpleGrantedAuthority("MODERATOR");
+        return new SimpleGrantedAuthority("ROLE_MODERATOR");
     }
 }

@@ -73,7 +73,7 @@ public class User {
     }
 
     public GrantedAuthority getRole() {
-        return new SimpleGrantedAuthority("USER");
+        return new SimpleGrantedAuthority("ROLE_USER");
     }
 
 }

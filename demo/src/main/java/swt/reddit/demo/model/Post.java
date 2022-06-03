@@ -51,11 +51,10 @@ public class Post {
     @JoinTable(name = "post_flair", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "flair_id"))
     private Set<Flair> flairs;
 
-    public Post(String title, String text, LocalDateTime creationDate, String imagePath, User user, Community community) {
+    public Post(String title, String text, LocalDateTime creationDate, User user, Community community) {
         this.title = title;
         this.text = text;
         this.creationDate = creationDate;
-        this.imagePath = imagePath;
         this.user = user;
         this.community = community;
     }

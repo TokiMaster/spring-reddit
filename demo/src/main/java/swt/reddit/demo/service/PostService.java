@@ -13,4 +13,5 @@ public interface PostService {
     Optional<Post> findPostById(Long id);
     Post updatePost(Post post);
     void deletePost(Post post);
+    List<Post> findPostsByCommunityId(Long id);
 }

@@ -12,6 +12,6 @@ public class Administrator extends User {
 
     @Override
     public GrantedAuthority getRole() {
-        return new SimpleGrantedAuthority("ADMIN");
+        return new SimpleGrantedAuthority("ROLE_ADMIN");
     }
 }
