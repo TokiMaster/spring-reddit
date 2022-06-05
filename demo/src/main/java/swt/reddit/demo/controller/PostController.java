@@ -44,7 +44,9 @@ public class PostController {
 
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
-            postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            if(!post.isDeleted()){
+                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            }
         }
 
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
@@ -110,6 +112,7 @@ public class PostController {
         }
         User loggedUser = userService.findByUsername(auth.getName());
         if(post.get().getUser().getUsername().equals(loggedUser.getUsername())){
+            post.get().setDeleted(true);
             postService.deletePost(post.get());
             return ResponseEntity.ok("Deleted post with id: " + id);
         }else{

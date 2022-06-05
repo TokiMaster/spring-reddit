@@ -64,8 +64,10 @@ public class CommunityController {
         List<Post> posts = postService.findPostsByCommunityId(id);
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
-            postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(),
-                    post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            if(!post.isDeleted()){
+                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(),
+                        post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+            }
         }
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
     }
