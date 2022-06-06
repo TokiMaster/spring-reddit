@@ -3,7 +3,6 @@ package swt.reddit.demo.dto;
 import lombok.*;
 import java.io.Serializable;
 
-
 @Data
 public class UserLoginDTO implements Serializable {
 

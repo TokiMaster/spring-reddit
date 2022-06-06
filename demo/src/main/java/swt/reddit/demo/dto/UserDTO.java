@@ -2,8 +2,6 @@ package swt.reddit.demo.dto;
 
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
-import swt.reddit.demo.model.User;
-
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 

@@ -1,8 +1,6 @@
 package swt.reddit.demo.dto;
 
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -13,7 +11,7 @@ public class CreatePostDTO implements Serializable {
     private final Long communityId;
     @NotNull
     private final String title;
-    @Length(min = 5)
+    @NotNull
     private final String text;
     private final String username;
 

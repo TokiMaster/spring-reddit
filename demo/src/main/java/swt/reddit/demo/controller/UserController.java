@@ -99,9 +99,13 @@ public class UserController {
         if(result.hasErrors()){
             return ResponseEntity.badRequest().body("Invalid json");
         }
+        User user = userService.findByUsername(userDTO.getUsername());
+        if(user != null){
+            return ResponseEntity.badRequest().body("Username already taken.");
+        }
         String password = passwordEncoder.encode(userDTO.getPassword());
-        User user = new User(userDTO.getUsername(), password, userDTO.getEmail(), LocalDateTime.now(), userDTO.getDisplayName());
-        return ResponseEntity.ok(userService.register(user));
+        User user1 = new User(userDTO.getUsername(), password, userDTO.getEmail(), LocalDateTime.now(), userDTO.getDisplayName());
+        return ResponseEntity.ok(userService.register(user1));
     }
 
     @PutMapping("/{id}")
