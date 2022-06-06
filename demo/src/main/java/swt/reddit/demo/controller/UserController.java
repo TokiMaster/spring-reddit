@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import swt.reddit.demo.dto.UserDTO;
+import swt.reddit.demo.dto.UserInfoDTO;
 import swt.reddit.demo.dto.UserLoginDTO;
 import swt.reddit.demo.dto.UserPasswordDTO;
 import swt.reddit.demo.model.User;
@@ -48,7 +49,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
-                          UserDetailsService userDetailsService, TokenUtils tokenUtils){
+                          UserDetailsService userDetailsService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -57,12 +58,12 @@ public class UserController {
 
     @GetMapping()
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
 
         List<User> users = userService.findAll();
 
         List<UserDTO> userDTO = new ArrayList<>();
-        for(User user : users){
+        for (User user : users) {
             userDTO.add(new UserDTO(user.getUsername(), user.getPassword(), user.getEmail(), user.getDisplayName()));
         }
 
@@ -71,9 +72,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getOneUser(@PathVariable("id") Long id){
+    public ResponseEntity<?> getOneUser(@PathVariable("id") Long id) {
         Optional<User> user = userService.findUserById(id);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().body("User with given id doesn't exist");
         }
         UserDTO userDTO = new UserDTO(user.get().getUsername(), user.get().getPassword(), user.get().getEmail(), user.get().getDisplayName());
@@ -95,12 +96,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid UserDTO userDTO, BindingResult result){
-        if(result.hasErrors()){
+    public ResponseEntity<?> register(@RequestBody @Valid UserDTO userDTO, BindingResult result) {
+        if (result.hasErrors()) {
             return ResponseEntity.badRequest().body("Invalid json");
         }
         User user = userService.findByUsername(userDTO.getUsername());
-        if(user != null){
+        if (user != null) {
             return ResponseEntity.badRequest().body("Username already taken.");
         }
         String password = passwordEncoder.encode(userDTO.getPassword());
@@ -111,28 +112,53 @@ public class UserController {
     @PutMapping("/{id}")
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
     public ResponseEntity<?> changePassword(@RequestBody @Valid UserPasswordDTO passwordDTO, BindingResult result,
-                        @PathVariable("id") Long id, Authentication auth){
-        if(result.hasErrors()){
+                                            @PathVariable("id") Long id, Authentication auth) {
+        if (result.hasErrors()) {
             return ResponseEntity.badRequest().body("Password must contain minimum eight characters, " +
                     "at least one uppercase letter, one lowercase letter, one number and one special character");
         }
         User loggedUser = userService.findByUsername(auth.getName());
         Optional<User> user = userService.findUserById(id);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().body("User with given id doesn't exist");
-        } else{
-            if(!loggedUser.getId().equals(user.get().getId())){
+        } else {
+            if (!loggedUser.getId().equals(user.get().getId())) {
                 return ResponseEntity.badRequest().body("Forbidden!");
             }
-            if(passwordEncoder.matches(passwordDTO.getPassword(), user.get().getPassword())){
+            if (passwordEncoder.matches(passwordDTO.getPassword(), user.get().getPassword())) {
                 String newPassword = passwordEncoder.encode(passwordDTO.getNewPassword());
                 user.get().setPassword(newPassword);
                 userService.updateUser(user.get());
                 return new ResponseEntity<>("Password changed successfully!", HttpStatus.OK);
-            }else {
+            } else {
                 return ResponseEntity.badRequest().body("Incorrect password");
             }
         }
     }
 
+    @PutMapping("/edit/{id}")
+    @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
+    public ResponseEntity<?> changeInfo(@RequestBody @Valid UserInfoDTO userInfoDTO, BindingResult result,
+                                        @PathVariable("id") Long id, Authentication auth) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body("Invalid json");
+        }
+        User loggedUser = userService.findByUsername(auth.getName());
+        Optional<User> user = userService.findUserById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body("User with given id doesn't exist");
+        } else {
+            if (!loggedUser.getId().equals(user.get().getId())) {
+                return ResponseEntity.badRequest().body("Forbidden!");
+            }
+            if (userInfoDTO.getDisplayName() != null) {
+                user.get().setDisplayName(userInfoDTO.getDisplayName());
+            }
+            if (userInfoDTO.getDescription() != null) {
+                user.get().setDescription(userInfoDTO.getDescription());
+            }
+            userService.updateUser(user.get());
+            return new ResponseEntity<>("Information's changed successfully!", HttpStatus.OK);
+        }
+    }
 }
