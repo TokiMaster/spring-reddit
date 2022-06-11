@@ -30,4 +30,11 @@ public class Reaction {
 
     @ManyToOne()
     private Comment comment;
+
+    public Reaction(ReactionType type, User user, Post post) {
+        this.type = type;
+        this.user = user;
+        this.post = post;
+        this.timeStamp = LocalDateTime.now();
+    }
 }

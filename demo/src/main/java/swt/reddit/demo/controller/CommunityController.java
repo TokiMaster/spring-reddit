@@ -66,7 +66,7 @@ public class CommunityController {
         for(Post post : posts){
             if(!post.isDeleted()){
                 postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(),
-                        post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+                        post.getCreationDate(), post.getUser().getUsername()));
             }
         }
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);

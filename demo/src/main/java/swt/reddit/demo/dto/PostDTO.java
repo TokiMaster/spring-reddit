@@ -13,7 +13,6 @@ public class PostDTO implements Serializable {
     private final String title;
     private final String text;
     private final LocalDateTime creationDate;
-    private final String imagePath;
     private final String username;
 
 }

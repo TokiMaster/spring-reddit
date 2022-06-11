@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import swt.reddit.demo.dto.CreatePostDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.dto.PostUpdateDTO;
-import swt.reddit.demo.model.Community;
-import swt.reddit.demo.model.Post;
-import swt.reddit.demo.model.User;
+import swt.reddit.demo.dto.ReactionDTO;
+import swt.reddit.demo.model.*;
 import swt.reddit.demo.service.CommunityService;
+import swt.reddit.demo.service.ReactionService;
 import swt.reddit.demo.service.serviceImpl.PostServiceImpl;
 import swt.reddit.demo.service.serviceImpl.UserServiceImpl;
 
@@ -37,6 +37,9 @@ public class PostController {
     @Autowired
     private CommunityService communityService;
 
+    @Autowired
+    private ReactionService reactionService;
+
     @GetMapping()
     public ResponseEntity<List<PostDTO>> getAllPosts(){
 
@@ -45,7 +48,7 @@ public class PostController {
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
             if(!post.isDeleted()){
-                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getImagePath(), post.getUser().getUsername()));
+                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername()));
             }
         }
 
@@ -58,7 +61,7 @@ public class PostController {
         if(post.isEmpty()){
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");
         }
-        PostDTO postDTO = new PostDTO(post.get().getId(), post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getImagePath(), post.get().getUser().getUsername());
+        PostDTO postDTO = new PostDTO(post.get().getId(), post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getUser().getUsername());
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
 
@@ -118,5 +121,37 @@ public class PostController {
         }else{
             return ResponseEntity.badRequest().body("Method not allowed!");
         }
+    }
+
+    @PostMapping("/{id}/vote")
+    @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
+    public ResponseEntity<?> vote(@PathVariable("id") Long id, @RequestBody @Valid ReactionDTO reactionDTO,
+                                    BindingResult result, Authentication auth){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body("Invalid json");
+        }
+        Optional<Post> post = postService.findPostById(id);
+        if(post.isEmpty()){
+            return ResponseEntity.badRequest().body("Post with given id doesn't exist");
+        }
+        User loggedUser = userService.findByUsername(auth.getName());
+        List<Reaction> reactions = reactionService.findReactionsByUserId(loggedUser.getId());
+        if(!reactions.isEmpty()){
+            for(Reaction reaction : reactions){
+                if(reaction.getPost().getId().equals(post.get().getId()) && reaction.getType().equals(reactionDTO.getType())){
+                    return ResponseEntity.badRequest().body("Can't react twice on the same post!");
+                }else if(reaction.getPost().getId().equals(post.get().getId()) && !reaction.getType().equals(reactionDTO.getType())){
+                    Optional<Reaction> reaction1 = reactionService.findOne(reaction.getId());
+                    if(reaction1.isPresent()){
+                        reaction1.get().setType(reactionDTO.getType());
+                        var updatedReaction = reactionService.updateReaction(reaction1.get());
+                        return ResponseEntity.ok(updatedReaction.getType());
+                    }
+                }
+            }
+        }
+        Reaction reaction = new Reaction(reactionDTO.getType(), loggedUser, post.get());
+        var createdReaction = reactionService.createReaction(reaction);
+        return ResponseEntity.ok(createdReaction.getId());
     }
 }
