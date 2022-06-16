@@ -14,5 +14,6 @@ public class PostDTO implements Serializable {
     private final String text;
     private final LocalDateTime creationDate;
     private final String username;
+    private final Integer karma;
 
 }

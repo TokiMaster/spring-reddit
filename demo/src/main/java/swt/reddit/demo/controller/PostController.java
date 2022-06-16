@@ -44,11 +44,25 @@ public class PostController {
     public ResponseEntity<List<PostDTO>> getAllPosts(){
 
         List<Post> posts = postService.findAll();
+        List<Reaction> reactions = reactionService.findAll();
+        List<Reaction> upvote = new ArrayList<>();
+        List<Reaction> downvote = new ArrayList<>();
+        Integer karma = 0;
 
         List<PostDTO> postsDTO = new ArrayList<>();
         for(Post post : posts){
             if(!post.isDeleted()){
-                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername()));
+                for(Reaction reaction: reactions){
+                    if(reaction.getPost().getId().equals(post.getId())){
+                        if(reaction.getType().equals(ReactionType.UPVOTE)){
+                            upvote.add(reaction);
+                        }else{
+                            downvote.add(reaction);
+                        }
+                    }
+                }
+                karma = upvote.size() - downvote.size();
+                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername(), karma));
             }
         }
 
@@ -61,7 +75,7 @@ public class PostController {
         if(post.isEmpty()){
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");
         }
-        PostDTO postDTO = new PostDTO(post.get().getId(), post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getUser().getUsername());
+        PostDTO postDTO = new PostDTO(post.get().getId(), post.get().getCommunity().getId(), post.get().getTitle(), post.get().getText(), post.get().getCreationDate(), post.get().getUser().getUsername(), post.get().getKarma());
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
 
@@ -77,7 +91,7 @@ public class PostController {
         if(community.isEmpty()){
             return ResponseEntity.badRequest().body("Community with given id doesn't exist!");
         }
-        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), user, community.get());
+        Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), user, community.get(), 0);
         var createdPost = postService.createPost(post);
         return ResponseEntity.ok(createdPost.getId());
     }

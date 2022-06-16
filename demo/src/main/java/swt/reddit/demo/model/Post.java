@@ -54,12 +54,16 @@ public class Post {
     @Column(columnDefinition="bit default 0")
     private boolean isDeleted;
 
-    public Post(String title, String text, LocalDateTime creationDate, User user, Community community) {
+    @Column
+    private Integer karma;
+
+    public Post(String title, String text, LocalDateTime creationDate, User user, Community community, Integer karma) {
         this.title = title;
         this.text = text;
         this.creationDate = creationDate;
         this.user = user;
         this.community = community;
+        this.karma = karma;
     }
 
 }

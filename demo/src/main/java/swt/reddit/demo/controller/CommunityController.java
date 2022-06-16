@@ -11,8 +11,11 @@ import swt.reddit.demo.dto.CreateCommunityDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.model.Community;
 import swt.reddit.demo.model.Post;
+import swt.reddit.demo.model.Reaction;
+import swt.reddit.demo.model.ReactionType;
 import swt.reddit.demo.service.CommunityService;
 import swt.reddit.demo.service.PostService;
+import swt.reddit.demo.service.ReactionService;
 import swt.reddit.demo.service.serviceImpl.CommunityServiceImpl;
 
 import javax.transaction.Transactional;
@@ -31,6 +34,9 @@ public class CommunityController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private ReactionService reactionService;
 
     @GetMapping()
     public ResponseEntity<List<CommunityDTO>> getAllCommunities(){
@@ -61,12 +67,25 @@ public class CommunityController {
         if(community.isEmpty()){
             return ResponseEntity.badRequest().body("Community with given id doesn't exist");
         }
-        List<Post> posts = postService.findPostsByCommunityId(id);
+        List<Post> posts = postService.findPostsByCommunityId(community.get().getId());
         List<PostDTO> postsDTO = new ArrayList<>();
+        List<Reaction> reactions = reactionService.findAll();
+        List<Reaction> upvote = new ArrayList<>();
+        List<Reaction> downvote = new ArrayList<>();
+        int karma = 0;
         for(Post post : posts){
             if(!post.isDeleted()){
-                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(),
-                        post.getCreationDate(), post.getUser().getUsername()));
+                for(Reaction reaction: reactions){
+                    if(reaction.getPost().getId().equals(post.getId())){
+                        if(reaction.getType().equals(ReactionType.UPVOTE)){
+                            upvote.add(reaction);
+                        }else{
+                            downvote.add(reaction);
+                        }
+                    }
+                }
+                karma = upvote.size() - downvote.size();
+                postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername(), karma));
             }
         }
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
