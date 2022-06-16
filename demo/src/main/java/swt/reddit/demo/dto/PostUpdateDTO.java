@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 @Data
 public class PostUpdateDTO implements Serializable {
-    private final String title;
+    private final Long id;
     private final String text;
-    private final String imagePath;
 }

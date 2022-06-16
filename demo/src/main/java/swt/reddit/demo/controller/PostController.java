@@ -98,20 +98,17 @@ public class PostController {
 
     @PutMapping("/{id}")
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
-    public ResponseEntity<?> editPost(@RequestBody @Valid PostUpdateDTO postDTO, BindingResult result, @PathVariable("id") Long id){
+    public ResponseEntity<?> editPost(@RequestBody @Valid PostUpdateDTO postDTO, BindingResult result, @PathVariable("id") Long id, Authentication auth){
         if(result.hasErrors()){
             return ResponseEntity.badRequest().body("Invalid json");
         }
         Optional<Post> post = postService.findPostById(id);
+        User loggedUser = userService.findByUsername(auth.getName());
         if (post.isPresent()){
-            if(postDTO.getText() != null){
-                post.get().setText(postDTO.getText());
-            }
-            if(postDTO.getImagePath() != null){
-                post.get().setImagePath(postDTO.getImagePath());
-            }
-            if(postDTO.getTitle() != null){
-                post.get().setTitle(postDTO.getTitle());
+            if(post.get().getUser().getUsername().equals(loggedUser.getUsername())){
+                if(postDTO.getText() != null){
+                    post.get().setText(postDTO.getText());
+                }
             }
         }else{
             return ResponseEntity.badRequest().body("Post with given id doesn't exist");

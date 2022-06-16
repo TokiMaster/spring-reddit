@@ -72,7 +72,7 @@ public class CommunityController {
         List<Reaction> reactions = reactionService.findAll();
         List<Reaction> upvote = new ArrayList<>();
         List<Reaction> downvote = new ArrayList<>();
-        int karma = 0;
+        Integer karma = 0;
         for(Post post : posts){
             if(!post.isDeleted()){
                 for(Reaction reaction: reactions){

@@ -14,5 +14,6 @@ public class CreatePostDTO implements Serializable {
     @NotNull
     private final String text;
     private final String username;
+    private final Integer karma;
 
 }
