@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import swt.reddit.demo.dto.CreatePostDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.dto.PostUpdateDTO;
@@ -28,17 +29,20 @@ import java.util.Optional;
 @RequestMapping("api/posts")
 public class PostController {
 
-    @Autowired
-    private PostServiceImpl postService;
+    private final PostServiceImpl postService;
 
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
 
-    @Autowired
-    private CommunityService communityService;
+    private final CommunityService communityService;
 
-    @Autowired
-    private ReactionService reactionService;
+    private final ReactionService reactionService;
+
+    public PostController(PostServiceImpl postService, UserServiceImpl userService, CommunityService communityService, ReactionService reactionService) {
+        this.postService = postService;
+        this.userService = userService;
+        this.communityService = communityService;
+        this.reactionService = reactionService;
+    }
 
     @GetMapping()
     public ResponseEntity<List<PostDTO>> getAllPosts(){
@@ -79,10 +83,11 @@ public class PostController {
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping(consumes = {"multipart/form-data"})
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
     @Transactional
-    public ResponseEntity<?> createPost(@RequestBody @Valid CreatePostDTO postDTO, BindingResult result, Authentication auth){
+    public ResponseEntity<?> createPost(@Valid @ModelAttribute CreatePostDTO postDTO,
+                                        BindingResult result, Authentication auth){
         if(result.hasErrors()){
             return ResponseEntity.badRequest().body("Invalid json");
         }
@@ -92,7 +97,7 @@ public class PostController {
             return ResponseEntity.badRequest().body("Community with given id doesn't exist!");
         }
         Post post = new Post(postDTO.getTitle(), postDTO.getText(), LocalDateTime.now(), user, community.get(), 0);
-        var createdPost = postService.createPost(post);
+        Post createdPost = postService.createPost(post, postDTO.getFile());
         return ResponseEntity.ok(createdPost.getId());
     }
 

@@ -1,6 +1,8 @@
 package swt.reddit.demo.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -15,5 +17,6 @@ public class CreatePostDTO implements Serializable {
     private final String text;
     private final String username;
     private final Integer karma;
+    private final MultipartFile file;
 
 }
