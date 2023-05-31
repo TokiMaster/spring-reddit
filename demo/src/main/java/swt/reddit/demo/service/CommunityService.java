@@ -1,5 +1,6 @@
 package swt.reddit.demo.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import swt.reddit.demo.model.Community;
 import swt.reddit.demo.model.Post;
 
@@ -11,7 +12,7 @@ public interface CommunityService {
     Optional<Community> findCommunityById(Long id);
     List<Community> findAll();
     @Transactional
-    Community createCommunity(Community community);
+    Community createCommunity(Community community, MultipartFile file);
     Community updateCommunity(Community community);
     void deleteCommunity(Community community);
 }

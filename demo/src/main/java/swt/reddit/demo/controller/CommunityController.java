@@ -28,14 +28,17 @@ import java.util.Optional;
 @RequestMapping("api/communities")
 public class CommunityController {
 
-    @Autowired
-    private CommunityService communityService;
+    private final CommunityService communityService;
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
-    @Autowired
-    private ReactionService reactionService;
+    private final ReactionService reactionService;
+
+    public CommunityController(CommunityService communityService, PostService postService, ReactionService reactionService) {
+        this.communityService = communityService;
+        this.postService = postService;
+        this.reactionService = reactionService;
+    }
 
     @GetMapping()
     public ResponseEntity<List<CommunityDTO>> getAllCommunities() {
@@ -90,15 +93,20 @@ public class CommunityController {
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping(consumes = {"multipart/form-data"})
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR"})
     @Transactional
-    public ResponseEntity<?> createCommunity(@RequestBody @Valid CreateCommunityDTO communityDTO, BindingResult result) {
+    public ResponseEntity<?> createCommunity(@ModelAttribute @Valid CreateCommunityDTO communityDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body("Invalid json");
         }
         Community community = new Community(communityDTO.getName(), communityDTO.getDescription(), LocalDateTime.now());
-        var createdCommunity = communityService.createCommunity(community);
+        Community createdCommunity;
+        if (communityDTO.getFile() == null) {
+            createdCommunity = communityService.createCommunity(community, null);
+        } else {
+            createdCommunity = communityService.createCommunity(community, communityDTO.getFile());
+        }
         return ResponseEntity.ok(createdCommunity.getId());
     }
 

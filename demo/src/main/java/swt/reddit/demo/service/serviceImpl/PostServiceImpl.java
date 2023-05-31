@@ -26,7 +26,7 @@ public class PostServiceImpl implements PostService {
         this.indexPostRepository = indexPostRepository;
     }
 
-    public Optional<String> parsePdf(MultipartFile file) {
+    public static Optional<String> parsePdf(MultipartFile file) {
         try (var pdfInputStream = file.getInputStream(); var pddDocument = PDDocument.load(pdfInputStream)) {
             PDFTextStripper pdfStripper = new PDFTextStripper();
             return Optional.of(pdfStripper.getText(pddDocument));
