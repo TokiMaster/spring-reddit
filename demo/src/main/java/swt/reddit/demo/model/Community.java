@@ -1,7 +1,21 @@
 package swt.reddit.demo.model;
 
-import lombok.*;
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -25,10 +39,8 @@ public class Community {
     @Column(nullable = false)
     private LocalDateTime creationDate;
 
-    @Column
     private boolean isSuspended;
 
-    @Column
     private String suspendedReason;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -51,4 +63,5 @@ public class Community {
         this.description = description;
         this.creationDate = creationDate;
     }
+
 }

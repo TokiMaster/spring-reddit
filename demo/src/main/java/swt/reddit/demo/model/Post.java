@@ -1,7 +1,22 @@
 package swt.reddit.demo.model;
 
-import lombok.*;
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -25,10 +40,7 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime creationDate;
 
-    @Column
-    private String imagePath;
-
-    @ManyToOne()
+    @ManyToOne
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)

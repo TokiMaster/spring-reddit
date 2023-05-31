@@ -32,28 +32,22 @@ import java.util.Optional;
 @RequestMapping("api/users")
 public class UserController {
 
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private TokenUtils tokenUtils;
+    private final TokenUtils tokenUtils;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
-                          UserDetailsService userDetailsService, TokenUtils tokenUtils) {
+    public UserController(UserServiceImpl userService, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, TokenUtils tokenUtils, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.authenticationManager = authenticationManager;
         this.tokenUtils = tokenUtils;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping()

@@ -32,4 +32,10 @@ public class IndexPost {
         this.descriptionPDF = descriptionPDF;
     }
 
+    public IndexPost(Post post) {
+        this.id = post.getId();
+        this.text = post.getText();
+        this.title = post.getTitle();
+    }
+
 }

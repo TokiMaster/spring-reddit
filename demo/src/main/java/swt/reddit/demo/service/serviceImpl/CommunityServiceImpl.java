@@ -1,9 +1,7 @@
 package swt.reddit.demo.service.serviceImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import swt.reddit.demo.model.Community;
-import swt.reddit.demo.model.Post;
 import swt.reddit.demo.repository.CommunityRepository;
 import swt.reddit.demo.service.CommunityService;
 
@@ -14,8 +12,11 @@ import java.util.Optional;
 @Service
 public class CommunityServiceImpl implements CommunityService {
 
-    @Autowired
-    private CommunityRepository communityRepository;
+    private final CommunityRepository communityRepository;
+
+    public CommunityServiceImpl(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
+    }
 
     @Override
     public Optional<Community> findCommunityById(Long id) {

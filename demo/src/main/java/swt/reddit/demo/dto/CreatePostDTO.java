@@ -1,6 +1,6 @@
 package swt.reddit.demo.dto;
 
-import lombok.*;
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;

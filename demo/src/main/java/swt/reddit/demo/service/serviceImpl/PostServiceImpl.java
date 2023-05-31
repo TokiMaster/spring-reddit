@@ -2,7 +2,6 @@ package swt.reddit.demo.service.serviceImpl;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import swt.reddit.demo.model.IndexPost;
@@ -37,32 +36,37 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findAll(){
+    public List<Post> findAll() {
         return postRepository.findAll();
     }
 
     @Override
     @Transactional
-    public Post createPost(Post post, MultipartFile pdfFile){
+    public Post createPost(Post post, MultipartFile pdfFile) {
         Post savePost = postRepository.save(post);
-        Optional<String> pdfText = parsePdf(pdfFile);
-        IndexPost indexPost = new IndexPost(savePost, pdfText.get());
+        IndexPost indexPost;
+        if (pdfFile == null) {
+            indexPost = new IndexPost(savePost);
+        } else {
+            Optional<String> pdfText = parsePdf(pdfFile);
+            indexPost = new IndexPost(savePost, pdfText.get());
+        }
         indexPostRepository.save(indexPost);
         return savePost;
     }
 
     @Override
-    public Optional<Post> findPostById(Long id){
+    public Optional<Post> findPostById(Long id) {
         return postRepository.findById(id);
     }
 
     @Override
-    public Post updatePost(Post post){
-       return postRepository.save(post);
+    public Post updatePost(Post post) {
+        return postRepository.save(post);
     }
 
     @Override
-    public void deletePost(Post post){
+    public void deletePost(Post post) {
         postRepository.save(post);
     }
 
