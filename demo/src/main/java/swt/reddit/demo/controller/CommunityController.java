@@ -1,11 +1,18 @@
 package swt.reddit.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import swt.reddit.demo.dto.CommunityDTO;
 import swt.reddit.demo.dto.CreateCommunityDTO;
 import swt.reddit.demo.dto.PostDTO;
@@ -23,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/communities")
@@ -141,4 +149,17 @@ public class CommunityController {
         communityService.deleteCommunity(community.get());
         return ResponseEntity.ok("Deleted community with id: " + id);
     }
+
+    @GetMapping("/{pdfContent}/search")
+    public List<CommunityDTO> findCommunityByContentOfPdf(@PathVariable("pdfContent") String pdfContent) {
+        return communityService.findByPdfContent(pdfContent)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private CommunityDTO toDto(Community community) {
+        return new CommunityDTO(community.getId(), community.getName(), community.getDescription(), community.getCreationDate());
+    }
+
 }

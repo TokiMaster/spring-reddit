@@ -1,5 +1,12 @@
 package swt.reddit.demo.service.serviceImpl;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import swt.reddit.demo.model.Community;
@@ -19,9 +26,13 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final IndexCommunityRepository indexCommunityRepository;
 
-    public CommunityServiceImpl(CommunityRepository communityRepository, IndexCommunityRepository indexCommunityRepository) {
+    private final ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+
+    public CommunityServiceImpl(CommunityRepository communityRepository, IndexCommunityRepository indexCommunityRepository, ElasticsearchRestTemplate elasticsearchRestTemplate) {
         this.communityRepository = communityRepository;
         this.indexCommunityRepository = indexCommunityRepository;
+        this.elasticsearchRestTemplate = elasticsearchRestTemplate;
     }
 
     @Override
@@ -58,4 +69,19 @@ public class CommunityServiceImpl implements CommunityService {
     public void deleteCommunity(Community community) {
         communityRepository.delete(community);
     }
+
+    @Override
+    public List<Community> findByPdfContent(String pdfContent) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        queryBuilder.must(QueryBuilders.matchQuery("pdfContent", pdfContent));
+
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(queryBuilder)
+                .build();
+
+        SearchHits<IndexCommunity> indexCommunities = elasticsearchRestTemplate.search(searchQuery, IndexCommunity.class, IndexCoordinates.of("reddit_community"));
+        var ids = indexCommunities.map(c -> c.getContent().getId());
+        return communityRepository.findAllById(ids);
+    }
+
 }

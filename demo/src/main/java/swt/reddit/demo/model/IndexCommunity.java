@@ -1,6 +1,10 @@
 package swt.reddit.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -10,7 +14,10 @@ import javax.persistence.Id;
 
 @Document(indexName = "reddit_community")
 @Setting(settingPath = "analyzers/serbianAnalyzer.json")
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class IndexCommunity {
 
     @Id
