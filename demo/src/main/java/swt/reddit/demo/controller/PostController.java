@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import swt.reddit.demo.dto.CreatePostDTO;
+import swt.reddit.demo.dto.IndexPostDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.dto.PostUpdateDTO;
 import swt.reddit.demo.dto.ReactionDTO;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/posts")
@@ -173,4 +175,24 @@ public class PostController {
         var createdReaction = reactionService.createReaction(reaction);
         return ResponseEntity.ok(createdReaction.getId());
     }
+
+    @GetMapping("/search")
+    public List<IndexPostDTO> searchPosts(@RequestParam(value = "pdfContent", required = false) String pdfContent,
+                                          @RequestParam(value = "title", required = false) String title,
+                                          @RequestParam(value = "text", required = false) String text) {
+        Iterable<IndexPost> indexPosts = postService.searchPosts(pdfContent, title, text);
+        List<IndexPost> indexPostList = new ArrayList<>();
+        for (IndexPost indexPost : indexPosts) {
+            indexPostList.add(indexPost);
+        }
+        return indexPostList
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private IndexPostDTO toDto(IndexPost indexPost) {
+        return new IndexPostDTO(indexPost.getId(), indexPost.getFileName(), indexPost.getTitle(), indexPost.getText());
+    }
+
 }

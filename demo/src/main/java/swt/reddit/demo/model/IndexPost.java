@@ -1,6 +1,9 @@
 package swt.reddit.demo.model;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -10,7 +13,10 @@ import javax.persistence.Id;
 
 @Document(indexName = "reddit_posts")
 @Setting(settingPath = "analyzers/serbianAnalyzer.json")
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class IndexPost {
 
     @Id
@@ -20,7 +26,7 @@ public class IndexPost {
     private String fileName;
 
     @Field(type = FieldType.Text)
-    private String descriptionPDF;
+    private String pdfContent;
 
     @Field(type = FieldType.Text)
     private String title;
@@ -28,11 +34,11 @@ public class IndexPost {
     @Field(type = FieldType.Text)
     private String text;
 
-    public IndexPost(Post post, String descriptionPDF, String fileName) {
+    public IndexPost(Post post, String pdfContent, String fileName) {
         this.id = post.getId();
         this.text = post.getText();
         this.title = post.getTitle();
-        this.descriptionPDF = descriptionPDF;
+        this.pdfContent = pdfContent;
         this.fileName = fileName;
     }
 
