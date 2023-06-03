@@ -30,6 +30,9 @@ public class IndexCommunity {
     private String description;
 
     @Field(type = FieldType.Text)
+    private String fileName;
+
+    @Field(type = FieldType.Text)
     private String pdfContent;
 
     public IndexCommunity(Community community) {
@@ -38,11 +41,12 @@ public class IndexCommunity {
         this.name = community.getName();
     }
 
-    public IndexCommunity(Community community, String pdfContent) {
+    public IndexCommunity(Community community, String pdfContent, String fileName) {
         this.id = community.getId();
         this.description = community.getDescription();
         this.name = community.getName();
         this.pdfContent = pdfContent;
+        this.fileName = fileName;
     }
 
 }

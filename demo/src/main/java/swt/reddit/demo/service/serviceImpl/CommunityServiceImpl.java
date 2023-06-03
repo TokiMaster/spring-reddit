@@ -54,7 +54,7 @@ public class CommunityServiceImpl implements CommunityService {
             indexCommunity = new IndexCommunity(community);
         } else {
             Optional<String> pdfContent = PostServiceImpl.parsePdf(file);
-            indexCommunity = new IndexCommunity(community, pdfContent.get());
+            indexCommunity = new IndexCommunity(community, pdfContent.get(), file.getOriginalFilename());
         }
         indexCommunityRepository.save(indexCommunity);
         return saveCommunity;
@@ -71,17 +71,24 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public List<Community> findByPdfContent(String pdfContent) {
+    public Iterable<IndexCommunity> searchCommunities(String pdfContent, String name, String description) {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        queryBuilder.must(QueryBuilders.matchQuery("pdfContent", pdfContent));
-
+        if (pdfContent != null) {
+            queryBuilder.must(QueryBuilders.matchQuery("pdfContent", pdfContent));
+        }
+        if (name != null) {
+            queryBuilder.must(QueryBuilders.matchQuery("name", name));
+        }
+        if (description != null) {
+            queryBuilder.must(QueryBuilders.matchQuery("description", description));
+        }
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
                 .build();
 
         SearchHits<IndexCommunity> indexCommunities = elasticsearchRestTemplate.search(searchQuery, IndexCommunity.class, IndexCoordinates.of("reddit_community"));
         var ids = indexCommunities.map(c -> c.getContent().getId());
-        return communityRepository.findAllById(ids);
+        return indexCommunityRepository.findAllById(ids);
     }
 
 }

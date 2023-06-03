@@ -2,6 +2,7 @@ package swt.reddit.demo.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import swt.reddit.demo.model.Community;
+import swt.reddit.demo.model.IndexCommunity;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -15,6 +16,6 @@ public interface CommunityService {
     Community createCommunity(Community community, MultipartFile file);
     Community updateCommunity(Community community);
     void deleteCommunity(Community community);
-    List<Community> findByPdfContent(String pdfContent);
+    Iterable<IndexCommunity> searchCommunities(String pdfContent, String name, String description);
 
 }

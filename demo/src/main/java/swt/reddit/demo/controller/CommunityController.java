@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import swt.reddit.demo.dto.CommunityDTO;
 import swt.reddit.demo.dto.CreateCommunityDTO;
+import swt.reddit.demo.dto.IndexCommunityDTO;
 import swt.reddit.demo.dto.PostDTO;
 import swt.reddit.demo.model.Community;
+import swt.reddit.demo.model.IndexCommunity;
 import swt.reddit.demo.model.Post;
 import swt.reddit.demo.model.Reaction;
 import swt.reddit.demo.model.ReactionType;
@@ -150,16 +153,23 @@ public class CommunityController {
         return ResponseEntity.ok("Deleted community with id: " + id);
     }
 
-    @GetMapping("/{pdfContent}/search")
-    public List<CommunityDTO> findCommunityByContentOfPdf(@PathVariable("pdfContent") String pdfContent) {
-        return communityService.findByPdfContent(pdfContent)
+    @GetMapping("/search")
+    public List<IndexCommunityDTO> findCommunities(@RequestParam(value = "pdfContent", required = false) String pdfContent,
+                                                   @RequestParam(value = "name", required = false) String name,
+                                                   @RequestParam(value = "description", required = false) String description) {
+        Iterable<IndexCommunity> indexCommunities = communityService.searchCommunities(pdfContent, name, description);
+        List<IndexCommunity> indexCommunityDTOS = new ArrayList<>();
+        for (IndexCommunity indexCommunity : indexCommunities) {
+            indexCommunityDTOS.add(indexCommunity);
+        }
+        return indexCommunityDTOS
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-    private CommunityDTO toDto(Community community) {
-        return new CommunityDTO(community.getId(), community.getName(), community.getDescription(), community.getCreationDate());
+    private IndexCommunityDTO toDto(IndexCommunity community) {
+        return new IndexCommunityDTO(community.getId(), community.getName(), community.getDescription(), community.getFileName());
     }
 
 }

@@ -49,7 +49,7 @@ public class PostServiceImpl implements PostService {
             indexPost = new IndexPost(savePost);
         } else {
             Optional<String> pdfText = parsePdf(pdfFile);
-            indexPost = new IndexPost(savePost, pdfText.get());
+            indexPost = new IndexPost(savePost, pdfText.get(), pdfFile.getOriginalFilename());
         }
         indexPostRepository.save(indexPost);
         return savePost;

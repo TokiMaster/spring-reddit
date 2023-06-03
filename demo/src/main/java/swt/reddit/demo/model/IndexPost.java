@@ -17,6 +17,9 @@ public class IndexPost {
     private Long id;
 
     @Field(type = FieldType.Text)
+    private String fileName;
+
+    @Field(type = FieldType.Text)
     private String descriptionPDF;
 
     @Field(type = FieldType.Text)
@@ -25,11 +28,12 @@ public class IndexPost {
     @Field(type = FieldType.Text)
     private String text;
 
-    public IndexPost(Post post, String descriptionPDF) {
+    public IndexPost(Post post, String descriptionPDF, String fileName) {
         this.id = post.getId();
         this.text = post.getText();
         this.title = post.getTitle();
         this.descriptionPDF = descriptionPDF;
+        this.fileName = fileName;
     }
 
     public IndexPost(Post post) {
