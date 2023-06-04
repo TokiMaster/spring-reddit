@@ -51,7 +51,7 @@ public class Post {
     @JoinColumn(name = "post_id")
     private Set<Comment> comments;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Set<Reaction> reactions;
 

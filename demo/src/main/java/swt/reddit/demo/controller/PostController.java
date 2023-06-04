@@ -48,24 +48,20 @@ public class PostController {
     public ResponseEntity<List<PostDTO>> getAllPosts() {
 
         List<Post> posts = postService.findAll();
-        List<Reaction> reactions = reactionService.findAll();
         List<Reaction> upvote = new ArrayList<>();
         List<Reaction> downvote = new ArrayList<>();
-        Integer karma = 0;
 
         List<PostDTO> postsDTO = new ArrayList<>();
         for (Post post : posts) {
             if (!post.isDeleted()) {
-                for (Reaction reaction : reactions) {
-                    if (reaction.getPost().getId().equals(post.getId())) {
-                        if (reaction.getType().equals(ReactionType.UPVOTE)) {
-                            upvote.add(reaction);
-                        } else {
-                            downvote.add(reaction);
-                        }
+                for (Reaction reaction : post.getReactions()) {
+                    if (reaction.getType().equals(ReactionType.UPVOTE)) {
+                        upvote.add(reaction);
+                    } else {
+                        downvote.add(reaction);
                     }
                 }
-                karma = upvote.size() - downvote.size();
+                int karma = upvote.size() - downvote.size();
                 postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername(), karma));
             }
         }
@@ -158,10 +154,10 @@ public class PostController {
         User loggedUser = userService.findByUsername(auth.getName());
         List<Reaction> reactions = reactionService.findReactionsByUserId(loggedUser.getId());
         if (!reactions.isEmpty()) {
-            for (Reaction reaction : reactions) {
-                if (reaction.getPost().getId().equals(post.get().getId()) && reaction.getType().equals(reactionDTO.getType())) {
+            for (Reaction reaction : post.get().getReactions()) {
+                if (reaction.getType().equals(reactionDTO.getType())) {
                     return ResponseEntity.badRequest().body("Can't react twice on the same post!");
-                } else if (reaction.getPost().getId().equals(post.get().getId()) && !reaction.getType().equals(reactionDTO.getType())) {
+                } else {
                     Optional<Reaction> reaction1 = reactionService.findOne(reaction.getId());
                     if (reaction1.isPresent()) {
                         reaction1.get().setType(reactionDTO.getType());

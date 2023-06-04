@@ -82,22 +82,18 @@ public class CommunityController {
         }
         List<Post> posts = postService.findPostsByCommunityId(community.get().getId());
         List<PostDTO> postsDTO = new ArrayList<>();
-        List<Reaction> reactions = reactionService.findAll();
         List<Reaction> upvote = new ArrayList<>();
         List<Reaction> downvote = new ArrayList<>();
-        Integer karma = 0;
         for (Post post : posts) {
             if (!post.isDeleted()) {
-                for (Reaction reaction : reactions) {
-                    if (reaction.getPost().getId().equals(post.getId())) {
-                        if (reaction.getType().equals(ReactionType.UPVOTE)) {
-                            upvote.add(reaction);
-                        } else {
-                            downvote.add(reaction);
-                        }
+                for (Reaction reaction : post.getReactions()) {
+                    if (reaction.getType().equals(ReactionType.UPVOTE)) {
+                        upvote.add(reaction);
+                    } else {
+                        downvote.add(reaction);
                     }
                 }
-                karma = upvote.size() - downvote.size();
+                int karma = upvote.size() - downvote.size();
                 postsDTO.add(new PostDTO(post.getId(), post.getCommunity().getId(), post.getTitle(), post.getText(), post.getCreationDate(), post.getUser().getUsername(), karma));
             }
         }

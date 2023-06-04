@@ -1,7 +1,5 @@
 package swt.reddit.demo.dto;
 
-import java.io.Serializable;
-
 public class IndexCommunityDTO {
 
     private final Long id;
